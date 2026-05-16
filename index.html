@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAMIND - Bienestar Universitario</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-red: #ff0000;
+        --dark-bg: #000000;
+        --light-bg: #f4f4f9;
+        --text-dark: #333333;
+        --text-light: #ffffff;
+        --gray-sub: #8e8e8e;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+
+      body {
+        background-color: var(--light-bg);
+        color: var(--text-dark);
+        overflow-x: hidden;
+        height: 100vh;
+      }
+
+      /* --- ONBOARDING CAROUSEL --- */
+      #onboarding {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--dark-bg);
+        z-index: 1000;
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+      }
+
+      .slide {
+        min-width: 100%;
+        height: 100%;
+        background-color: var(--dark-bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        color: white;
+        text-align: center;
+      }
+
+      .img-placeholder {
+        width: 180px;
+        height: 180px;
+        background: #1a1a1a;
+        border-radius: 50%;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid var(--primary-red);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      }
+
+      .slide h2 {
+        font-size: 20pt;
+        margin-bottom: 15px;
+        color: var(--primary-red);
+      }
+      .slide p {
+        font-size: 11pt;
+        color: #ccc;
+        line-height: 1.5;
+        max-width: 300px;
+      }
+
+      .stepper {
+        display: flex;
+        gap: 10px;
+        margin: 30px 0;
+      }
+
+      .step {
+        width: 8px;
+        height: 8px;
+        background: #555;
+        border-radius: 50%;
+      }
+
+      .step.active {
+        background: white;
+        width: 24px;
+        border-radius: 4px;
+      }
+
+      .cta-btn {
+        background-color: var(--primary-red);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 10pt;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: transform 0.2s;
+      }
+      .cta-btn:active {
+        transform: scale(0.95);
+      }
+
+      /* --- MAIN LAYOUT --- */
+      #main-app {
+        display: none;
+        padding-bottom: 80px;
+      }
+
+      header {
+        padding: 15px 20px;
+        background: white;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+      }
+
+      header h1 {
+        color: var(--primary-red);
+        font-size: 16pt;
+        letter-spacing: 4px;
+        font-weight: 900;
+      }
+
+      .section-container {
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--card-shadow);
+      }
+
+      h2.section-title {
+        font-size: 13pt;
+        margin-bottom: 15px;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      h2.section-title::before {
+        content: "";
+        width: 4px;
+        height: 18px;
+        background: var(--primary-red);
+        border-radius: 2px;
+      }
+
+      /* --- STICKY FOOTER --- */
+      footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-around;
+        padding: 12px 0;
+        z-index: 200;
+      }
+
+      .nav-item {
+        color: #bbb;
+        font-size: 16pt;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .nav-item.active {
+        color: var(--primary-red);
+        transform: translateY(-2px);
+      }
+
+      /* --- MODULES SPECIFICS --- */
+      .table-wrapper {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 400px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 12px 8px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 9pt;
+      }
+      th {
+        color: var(--gray-sub);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 8pt;
+      }
+      .risk-badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 8pt;
+      }
+      .risk-high {
+        background: #ffebeb;
+        color: #ff0000;
+        border: 1px solid #ffcccc;
+      }
+
+      .chat-box {
+        height: 350px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 10px;
+      }
+      .msg {
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 85%;
+        font-size: 10pt;
+        line-height: 1.4;
+      }
+      .bot {
+        background: #f0f0f0;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+      }
+      .user {
+        background: var(--primary-red);
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+      }
+
+      .chat-input {
+        display: flex;
+        gap: 10px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+      }
+      .chat-input input {
+        flex: 1;
+        padding: 12px 18px;
+        border: 1px solid #eee;
+        border-radius: 25px;
+        outline: none;
+        background: #fafafa;
+        font-size: 10pt;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @media (min-width: 768px) {
+        footer {
+          width: 450px;
+          left: 50%;
+          transform: translateX(-50%);
+          bottom: 20px;
+          border-radius: 40px;
+          border: 1px solid #eee;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ONBOARDING CAROUSEL -->
+    <div id="onboarding">
+      <div class="slide">
+        <div class="img-placeholder">
+          <i
+            class="fa-solid fa-brain fa-3x"
+            style="color: var(--primary-red)"
+          ></i>
+        </div>
+        <p>El espacio que te conecta con tu interior</p>
+        <div class="stepper">
+          <div class="step active"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+        </div>
+        <button class="cta-btn" onclick="nextSlide(1)">Siguiente</button>
+      </div>
+      <div class="slide">
+        <div class="img-placeholder">
+          <i
+            class="fa-solid fa-bolt fa-3x"
+            style="color: var(--primary-red)"
+          ></i>
+        </div>
+        <p>
+          Monitoreamos tu cinemática (velocidad y aceleración) para analizar tu
+          nivel de actividad física.
+        </p>
+        <div class="stepper">
+          <div class="step"></div>
+          <div class="step active"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+        </div>
+        <button class="cta-btn" onclick="nextSlide(2)">Continuar</button>
+      </div>
+      <div class="slide">
+        <div class="img-placeholder">
+          <i
+            class="fa-solid fa-heart fa-3x"
+            style="color: var(--primary-red)"
+          ></i>
+        </div>
+        <p>Haz seguimiento de tu estado de ánimo</p>
+        <div class="stepper">
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step active"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+        </div>
+        <button class="cta-btn" onclick="nextSlide(3)">Interesante</button>
+      </div>
+      <div class="slide">
+        <div class="img-placeholder">
+          <i
+            class="fa-solid fa-comments fa-3x"
+            style="color: var(--primary-red)"
+          ></i>
+        </div>
+        <p>Chatbot integrado para acompañamiento personalizado</p>
+        <div class="stepper">
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step active"></div>
+          <div class="step"></div>
+        </div>
+        <button class="cta-btn" onclick="nextSlide(4)">Entendido</button>
+      </div>
+      <div class="slide">
+        <div class="img-placeholder">
+          <i
+            class="fa-solid fa-university fa-3x"
+            style="color: var(--primary-red)"
+          ></i>
+        </div>
+        <h2>SAMIND</h2>
+        <p>La app que está contigo en todo momento</p>
+        <div class="stepper">
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step"></div>
+          <div class="step active"></div>
+        </div>
+        <button class="cta-btn" onclick="finishOnboarding()">COMIENZA</button>
+      </div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div id="main-app">
+      <header>
+        <h1>SAMIND</h1>
+      </header>
+
+      <main class="section-container">
+        <!-- Dashboard Física -->
+        <section id="fisica" class="app-section">
+          <h2 class="section-title">Actividad física</h2>
+          <div class="card">
+            <canvas id="physicsChart" height="250"></canvas>
+            <div
+              style="
+                margin-top: 20px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+              "
+            >
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 15px;
+                  border-radius: 12px;
+                  text-align: center;
+                "
+              >
+                <span style="font-size: 8pt; color: #888">VELOCIDAD PROM</span>
+                <div
+                  style="
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: var(--primary-red);
+                  "
+                >
+                  1.4 m/s
+                </div>
+              </div>
+              <div
+                style="
+                  background: #f9f9f9;
+                  padding: 15px;
+                  border-radius: 12px;
+                  text-align: center;
+                "
+              >
+                <span style="font-size: 8pt; color: #888">ACELERACIÓN MÁX</span>
+                <div
+                  style="
+                    font-size: 14pt;
+                    font-weight: bold;
+                    color: var(--text-dark);
+                  "
+                >
+                  2.1 m/s²
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tareas (MODIFICADO) -->
+        <section id="tareas" class="app-section hidden">
+          <h2 class="section-title">Mi lista de tareas</h2>
+          <div class="card">
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                align-items: center;
+              "
+            >
+              <input
+                type="text"
+                id="taskInput"
+                placeholder="Añadir nueva tarea..."
+                style="
+                  flex: 1;
+                  padding: 12px;
+                  border: 1px solid #eee;
+                  border-radius: 12px;
+                  outline: none;
+                  font-size: 10pt;
+                "
+              />
+              <button
+                onclick="startDictation()"
+                id="micBtn"
+                style="
+                  background: #f9f9f9;
+                  color: var(--text-dark);
+                  border: 1px solid #eee;
+                  width: 45px;
+                  height: 45px;
+                  border-radius: 50%;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                "
+              >
+                <i class="fa-solid fa-microphone"></i>
+              </button>
+              <button
+                onclick="addTask()"
+                style="
+                  background: var(--primary-red);
+                  color: white;
+                  border: none;
+                  width: 45px;
+                  height: 45px;
+                  border-radius: 12px;
+                  cursor: pointer;
+                "
+              >
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+            <div id="taskList">
+              <!-- Tarea de ejemplo 1 (Completada) -->
+              <div
+                class="task-item"
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 12px 0;
+                  border-bottom: 1px solid #f5f5f5;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    flex: 1;
+                    cursor: pointer;
+                  "
+                  onclick="toggleTask(this)"
+                >
+                  <i
+                    class="fa-solid fa-circle-check task-check"
+                    style="color: var(--primary-red); font-size: 1.2em"
+                  ></i>
+                  <span
+                    class="task-text"
+                    style="
+                      font-size: 10pt;
+                      transition: 0.2s;
+                      text-decoration: line-through;
+                      color: #bbb;
+                    "
+                    >Tarea por default</span
+                  >
+                </div>
+                <button
+                  onclick="deleteTask(this)"
+                  style="
+                    background: none;
+                    border: none;
+                    color: #ff6b6b;
+                    cursor: pointer;
+                    padding: 5px;
+                  "
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Matriz de Riesgo -->
+        <section id="riesgo" class="app-section hidden">
+          <h2 class="section-title">Matriz de Riesgo Estudiantil</h2>
+          <div class="card table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Carga Horaria</th>
+                  <th>Estrés académico</th>
+                  <th>Estado de Ánimo</th>
+                  <th>Interacción Social</th>
+                  <th>Horas de Sueño</th>
+                  <th>Riesgo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Alta (45h)</td>
+                  <td>8/10</td>
+                  <td>Bajo</td>
+                  <td>Poca</td>
+                  <td>4h</td>
+                  <td><span class="risk-badge risk-high">Crítico</span></td>
+                </tr>
+                <tr>
+                  <td>Media (30h)</td>
+                  <td>5/10</td>
+                  <td>Medio</td>
+                  <td>Alta</td>
+                  <td>6h</td>
+                  <td>
+                    <span
+                      class="risk-badge"
+                      style="
+                        background: #fff4e6;
+                        color: #d97706;
+                        border: 1px solid #fee2e2;
+                      "
+                      >Moderado</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Baja (15h)</td>
+                  <td>2/10</td>
+                  <td>Alto</td>
+                  <td>Alta</td>
+                  <td>8h</td>
+                  <td>
+                    <span
+                      class="risk-badge"
+                      style="
+                        background: #ecfdf5;
+                        color: #059669;
+                        border: 1px solid #d1fae5;
+                      "
+                      >Bajo</span
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Chatbot -->
+        <section id="chat" class="app-section hidden">
+          <h2 class="section-title">Chatbot</h2>
+          <div class="card" style="padding: 10px">
+            <div class="chat-box" id="chatBox">
+              <div class="msg bot">
+                ¡Hola! Soy el asistente virtual de SAMIND. ¿En qué puedo
+                apoyarte hoy?
+              </div>
+            </div>
+            <div class="chat-input">
+              <input type="text" id="chatInput" placeholder="Mensaje..." />
+              <button
+                onclick="sendMessage()"
+                style="
+                  background: none;
+                  border: none;
+                  color: var(--primary-red);
+                  font-size: 1.4rem;
+                  cursor: pointer;
+                  padding: 0 5px;
+                "
+              >
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- FOOTER NAVIGATION (Instagram Style) -->
+      <footer>
+        <div class="nav-item active" onclick="showSection('fisica', this)">
+          <i class="fa-solid fa-chart-line"></i>
+          <span style="font-size: 7pt; margin-top: 4px">Actividad física</span>
+        </div>
+        <div class="nav-item" onclick="showSection('tareas', this)">
+          <i class="fa-solid fa-calendar-check"></i>
+          <span style="font-size: 7pt; margin-top: 4px">Tareas</span>
+        </div>
+        <div class="nav-item" onclick="showSection('riesgo', this)">
+          <i class="fa-solid fa-table-list"></i>
+          <span style="font-size: 7pt; margin-top: 4px">Matriz</span>
+        </div>
+        <div class="nav-item" onclick="showSection('chat', this)">
+          <i class="fa-solid fa-comment-dots"></i>
+          <span style="font-size: 7pt; margin-top: 4px">Chatbot</span>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // ONBOARDING CAROUSEL
+      function nextSlide(current) {
+        document.getElementById("onboarding").style.transform =
+          `translateX(-${current * 100}%)`;
+      }
+
+      function finishOnboarding() {
+        document.getElementById("onboarding").style.opacity = "0";
+        setTimeout(() => {
+          document.getElementById("onboarding").classList.add("hidden");
+          document.getElementById("main-app").style.display = "block";
+          initChart();
+        }, 500);
+      }
+
+      // NAVIGATION
+      function showSection(sectionId, element) {
+        document
+          .querySelectorAll(".app-section")
+          .forEach((s) => s.classList.add("hidden"));
+        document.getElementById(sectionId).classList.remove("hidden");
+
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((i) => i.classList.remove("active"));
+        element.classList.add("active");
+
+        if (sectionId === "fisica") initChart();
+      }
+
+      // CHART.JS (Physics Data)
+      /*let myChart = null;
+      function initChart() {
+        const ctx = document.getElementById("physicsChart").getContext("2d");
+        if (myChart) myChart.destroy();
+
+        myChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"],
+            datasets: [
+              {
+                label: "Desplazamiento (Km)",
+                data: [2.1, 3.5, 1.8, 4.2, 3.0, 5.5, 1.2],
+                borderColor: "#FF0000",
+                borderWidth: 3,
+                pointBackgroundColor: "#FF0000",
+                pointRadius: 4,
+                tension: 0.4,
+                fill: true,
+                backgroundColor: "rgba(255, 0, 0, 0.05)",
+              },
+              {
+                label: "Aceleración (m/s²)",
+                data: [0.9, 1.4, 0.7, 1.8, 1.1, 2.1, 0.5],
+                borderColor: "#333333",
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: "top",
+                labels: { boxWidth: 10, font: { size: 10 } },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: "#f0f0f0" },
+                ticks: { font: { size: 9 } },
+              },
+              x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+            },
+          },
+        });
+      }*/
+
+      // --- LÓGICA DEL MÓDULO DE TAREAS (MODIFICADO) ---
+
+      // Agregar nueva tarea
+      function addTask() {
+        const input = document.getElementById("taskInput");
+        if (!input.value.trim()) return;
+
+        const list = document.getElementById("taskList");
+        const item = document.createElement("div");
+        item.className = "task-item";
+        item.style =
+          "display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f5f5f5;";
+
+        item.innerHTML = `
+                <div style="display:flex; align-items:center; gap:12px; flex:1; cursor:pointer;" onclick="toggleTask(this)">
+                    <i class="fa-regular fa-circle task-check" style="color:#ddd; font-size: 1.2em;"></i>
+                    <span class="task-text" style="font-size:10pt; transition:0.2s;">${input.value}</span>
+                </div>
+                <button onclick="deleteTask(this)" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:5px;"><i class="fa-solid fa-trash"></i></button>
+            `;
+
+        list.prepend(item);
+        input.value = "";
+      }
+
+      // Dictado por voz (Web Speech API)
+      function startDictation() {
+        if (
+          window.hasOwnProperty("webkitSpeechRecognition") ||
+          window.hasOwnProperty("SpeechRecognition")
+        ) {
+          const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+          const recognition = new SpeechRecognition();
+          recognition.lang = "es-ES";
+          recognition.continuous = false;
+          recognition.interimResults = false;
+
+          const micBtn = document.getElementById("micBtn");
+
+          recognition.onstart = function () {
+            micBtn.style.color = "var(--primary-red)";
+            micBtn.style.borderColor = "var(--primary-red)";
+            micBtn.innerHTML =
+              '<i class="fa-solid fa-microphone fa-beat-fade"></i>'; // Añade animación
+          };
+
+          recognition.onresult = function (e) {
+            document.getElementById("taskInput").value =
+              e.results[0][0].transcript;
+            recognition.stop();
+          };
+
+          recognition.onerror = function (e) {
+            recognition.stop();
+          };
+
+          recognition.onend = function () {
+            micBtn.style.color = "var(--text-dark)";
+            micBtn.style.borderColor = "#eee";
+            micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>'; // Quita animación
+          };
+
+          recognition.start();
+        } else {
+          alert(
+            "Tu navegador no soporta el dictado por voz. Te sugerimos intentarlo usando Google Chrome.",
+          );
+        }
+      }
+
+      // Tachar / Desmarcar tarea completada
+      function toggleTask(element) {
+        const icon = element.querySelector(".task-check");
+        const text = element.querySelector(".task-text");
+
+        if (icon.classList.contains("fa-circle")) {
+          // Marcar como completada
+          icon.classList.replace("fa-circle", "fa-circle-check");
+          icon.style.color = "var(--primary-red)";
+          text.style.textDecoration = "line-through";
+          text.style.color = "#bbb";
+        } else {
+          // Desmarcar
+          icon.classList.replace("fa-circle-check", "fa-circle");
+          icon.style.color = "#ddd";
+          text.style.textDecoration = "none";
+          text.style.color = "var(--text-dark)";
+        }
+      }
+
+      // Eliminar tarea permanentemente
+      function deleteTask(btn) {
+        const taskItem = btn.closest(".task-item");
+        if (taskItem) {
+          taskItem.remove();
+        }
+      }
+
+      // Permitir crear tarea presionando "Enter"
+      document
+        .getElementById("taskInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") addTask();
+        });
+
+      // CHATBOT
+      function sendMessage() {
+        const input = document.getElementById("chatInput");
+        const box = document.getElementById("chatBox");
+        if (!input.value) return;
+
+        const userMsg = document.createElement("div");
+        userMsg.className = "msg user";
+        userMsg.innerText = input.value;
+        box.appendChild(userMsg);
+
+        const text = input.value.toLowerCase();
+        input.value = "";
+        box.scrollTop = box.scrollHeight;
+
+        setTimeout(() => {
+          const botMsg = document.createElement("div");
+          botMsg.className = "msg bot";
+
+          // Utilizamos switch(true) para poder evaluar las condiciones de .includes()
+          switch (true) {
+            case text.includes("hola"):
+            case text.includes("Hola"):
+              botMsg.innerText = "¡Hola! ¿Cómo te sientes hoy?.";
+              break;
+
+            case text.includes("estresado"):
+            case text.includes("cansado"):
+              botMsg.innerText =
+                "Detecto señales de fatiga académica. Te sugiero aplicar la técnica Pomodoro para reducir tus niveles de estrés. ¿Quieres que te explique?";
+              break;
+
+            case text.includes("si"): // Añadido en minúscula para asegurar el match con toLowerCase()
+            case text.includes("Si"):
+            case text.includes("física"):
+            case text.includes("movimiento"):
+              botMsg.innerText =
+                "Toma las tareas grandes y dividelas en tareas más pequeñas, lo que permite que todo sea más fácil.";
+              break;
+
+              case text.includes("gracias"):
+              botMsg.innerText =
+                "Fue un gusto ayudarte. Recuerda que estoy aquí para lo que necesites";
+              break;
+
+            case text.includes("bienestar"):
+            case text.includes("ayuda"):
+              botMsg.innerText =
+                "Bienestar Universitario se pondrá en contacto contigo en un momento";
+              break;
+
+            default:
+              botMsg.innerText =
+                "Interesante. Mi modelo analítico está procesando esa información para ajustar tu matriz de riesgo.";
+              break;
+          }
+
+          box.appendChild(botMsg);
+          box.scrollTop = box.scrollHeight;
+        }, 800);
+      }
+
+      document
+        .getElementById("chatInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") sendMessage();
+        });
+    </script>
+  </body>
+</html>
