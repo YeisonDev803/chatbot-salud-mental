@@ -892,33 +892,69 @@
           botMsg.className = "msg bot";
 
           // Utilizamos switch(true) para poder evaluar las condiciones de .includes()
+          // Convertimos el texto a minúsculas una sola vez para simplificar los casos
+          const cleanText = text.toLowerCase();
+
           switch (true) {
-            case text.includes("hola"):
-            case text.includes("Hola"):
+            case cleanText.includes("hola"):
               botMsg.innerText = "¡Hola! ¿Cómo te sientes hoy?.";
               break;
 
-            case text.includes("estresado"):
-            case text.includes("cansado"):
+            case cleanText.includes("estresado"):
+            case cleanText.includes("cansado"):
               botMsg.innerText =
                 "Detecto señales de fatiga académica. Te sugiero aplicar la técnica Pomodoro para reducir tus niveles de estrés. ¿Quieres que te explique?";
-              break;
+              break; // <-- ¡Faltaba!
 
-            case text.includes("si"): // Añadido en minúscula para asegurar el match con toLowerCase()
-            case text.includes("Si"):
-            case text.includes("física"):
-            case text.includes("movimiento"):
+            case cleanText.includes("feliz"):
               botMsg.innerText =
-                "Toma las tareas grandes y dividelas en tareas más pequeñas, lo que permite que todo sea más fácil.";
+                "Grandioso😁. Espero que el resto de tu día te vaya genial";
+              break; // <-- ¡Faltaba!
+
+            case cleanText.includes("triste"):
+              botMsg.innerText =
+                "Ohh, que mal🫤. Recuerda que todo va a estar bien.";
+              break; // <-- ¡Faltaba!
+
+            case cleanText.includes("frustrado"):
+              botMsg.innerText =
+                "Vaya!😯. Entiendo que a veces las cosas no resultan como queremos; pero recuerda: El éxito no es de los más rápidos, sino de los que tienen la paciencia de corregir y la audacia de seguir intentándolo.";
+              break; // <-- ¡Faltaba!
+
+            case cleanText.includes("enojado"):
+              botMsg.innerText =
+                "El enojo es una descarga de energía. No la gastes gritando o rompiendo cosas; úsala para trabajar el doble de rápido y callar bocas con hechos.";
+              break; // <-- ¡Faltaba!
+
+            case cleanText.includes("decepcionado"):
+              botMsg.innerText =
+                "Que un resultado te haya decepcionado no significa que tu esfuerzo haya sido en vano. Aprendiste cómo no hacer las cosas, y eso ya es una ventaja competitiva.";
+              break; // <-- ¡Faltaba!
+
+            case cleanText.includes("deprimido"):
+              botMsg.innerText =
+                "El progreso no siempre es una línea recta hacia arriba. Dar un paso atrás o tener un día gris también es parte del camino para volver a estar fuerte.";
+              break; // <-- ¡Faltaba!
+
+            case cleanText.includes("ansioso"):
+              botMsg.innerText =
+                "No necesitas tener todo el camino resuelto para dar el siguiente paso. Con que puedas ver el metro que tienes justo enfrente, es suficiente para avanzar.";
               break;
 
-              case text.includes("gracias"):
+            case cleanText.includes("si"):
+            case cleanText.includes("física"):
+            case cleanText.includes("movimiento"):
+              botMsg.innerText =
+                "Toma las tareas grandes y divídelas en tareas más pequeñas, lo que permite que todo sea más fácil.";
+              break;
+
+            case cleanText.includes("gracias"):
               botMsg.innerText =
                 "Fue un gusto ayudarte. Recuerda que estoy aquí para lo que necesites";
               break;
 
-            case text.includes("bienestar"):
-            case text.includes("ayuda"):
+            case cleanText.includes("bienestar"):
+            case cleanText.includes("ayuda"):
               botMsg.innerText =
                 "Bienestar Universitario se pondrá en contacto contigo en un momento";
               break;
